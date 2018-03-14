@@ -20,11 +20,14 @@ import {
   Easing,
   Alert,
   ActivityIndicator,
+  ProgressViewIOS,
 } from 'react-native';
 import Video from 'react-native-video';
 import MainStyle from '../../MainStyle/MainStyle';
 import icons  from '../../icons/icons';
 import AutoHeightWebView from 'react-native-autoheight-webview';
+import {scaleSize,setSpText} from '../../ScreenUtil/ScreenUtil';
+var TimerMixin = require('react-timer-mixin');
 let width = Dimensions.get('window').width;
 let height = Dimensions.get('window').height;
 export default class DetailArticle extends Component {
@@ -45,9 +48,14 @@ export default class DetailArticle extends Component {
       isTrue: false,
       fadeAnima1: new Animated.Value(0),
       loaded: false,
+      webloadprogress:0,
+      progressOpacity: new Animated.Value(0),
+      progressWidth: new Animated.Value(0),
+      opn:scaleSize(2),
+      
     };
   }
-
+  
   static navigationOptions = ({ navigation, screenProps }) => ({
     //左侧标题
     // headerTitle: '我是详细文章页面',
@@ -77,39 +85,60 @@ export default class DetailArticle extends Component {
      }
     console.log(e.nativeEvent)
     console.log(e.nativeEvent.data);
-  };
-    
-  
+  }
   componentDidMount() {
     //在static中使用this方法  
     // this.props.navigation.setParams({
     //   navigatePress: () => this.props.navigation.goBack(),
     //   gentie: this.props.navigation.state.params.item.replyCount
     // })
+    console.log(this.state.opn);
     this.fetchData();
-  }  
+    Animated.timing(this.state.progressWidth,{  //显示加载webview加载控制条
+      toValue: 1,
+      duration:2000,
+      Easing: Easing.bezier(.25,.79,.87,.31),
+    }).start()
+    // this.updateProgress();
+  }
+  componentWillUnmount () {
+    clearTimeout(this.timer)
+  }
+  // updateProgress() {
+  //   var webloadprogress = this.state.webloadprogress + 0.01;
+  //   if (webloadprogress == 0.9) {
+  //     cancelAnimationFrame(this.requestAni)
+  //   }
+  //   this.setState({ webloadprogress, });
+  //   this.requestAni=setInterval(() => {
+  //     this.updateProgress();
+  //   },100);
+   
+  // }
   render() {
     const { goBack,state } = this.props.navigation;
     let timing = Animated.timing;
-    if(!this.state.loaded) {
-      return (
-        <View style={MainStyle.container}>
-          <ActivityIndicator/>
-        </View>
-      );
-    }
+    // if(!this.state.loaded) {  数据没有加载完成，显示该View
+    //   return (
+    //     <View style={MainStyle.container}>
+    //       <ActivityIndicator/>
+    //     </View>
+    //   );
+    // }
     return (
       <View style={MainStyle.colorwhite}>
         <View style={styles.Detailheader}>
-          <TouchableOpacity onPress={() => goBack()} activeOpacity={1}>
+          {/* 顶部左边返回按钮 */}
+          <TouchableOpacity onPress={() => goBack()} activeOpacity={1}>  
             <View style={styles.headerLeftStyle}>
-              <Image source={{ uri: icons.back }} style={{ width: 25, height: 25, tintColor: '#555' }} />
+              <Image source={{ uri: icons.back }} style={{ width: scaleSize(50), height: scaleSize(50), tintColor: '#555' }} />
             </View>
           </TouchableOpacity>
-          <Animated.View style={[styles.headerRightStyle, {
+          {/* 顶部右边跟帖数量 */}
+          <Animated.View style={[styles.headerRightStyle, {   
               width: this.state.widthAnima.interpolate({
                 inputRange: [0, 1],
-                outputRange: [100, 200]
+                outputRange: [scaleSize(200), scaleSize(400)]
               }),
               backgroundColor: this.state.backgroundColorAnima.interpolate({
                 inputRange: [0, 1],
@@ -117,7 +146,7 @@ export default class DetailArticle extends Component {
               })
             }]}>
             <Animated.Text style={{
-              fontSize: 14, fontWeight: '900', position: 'absolute', justifyContent: 'center', alignItems: 'center',
+              fontSize: setSpText(14), fontWeight: '900', position: 'absolute', justifyContent: 'center', alignItems: 'center',
               color: this.state.fontColorAnima.interpolate({
                 inputRange: [0,1],
                 outputRange: ['rgb(255,8,42)','#fff']
@@ -129,7 +158,7 @@ export default class DetailArticle extends Component {
               }}>{this.state.gentie}
             </Animated.Text>
             <Animated.Text style={{
-              fontSize: 14, fontWeight: '900',position:'absolute',justifyContent:'center',alignItems:'center',
+              fontSize: setSpText(14), fontWeight: '900',position:'absolute',justifyContent:'center',alignItems:'center',
               color: this.state.fontColorAnima.interpolate({
                 inputRange: [0, 1],
                 outputRange: ['rgb(255,8,42)', '#fff']
@@ -141,7 +170,25 @@ export default class DetailArticle extends Component {
             }}>{this.state.genttie1}
             </Animated.Text>
           </Animated.View>
+          {/* 顶部右边跟帖数量结束 */}
         </View>
+        {/* 进度条 */}
+        <View>
+          {/* <View style={{ width: width, height: scaleSize(4),backgroundColor:'#fff',position:'absolute',zIndex:1,opacity: this.state.opn}}>
+
+          </View> */}
+          <Animated.View
+            style={{
+              width: this.state.progressWidth.interpolate({
+                inputRange: [0, 1],
+                outputRange: [0, width * 0.95]
+              }),
+              height: this.state.opn,
+              backgroundColor: 'red',
+            }}>
+          </Animated.View>
+        </View>
+    
           <ScrollView
             onScroll={(e) => { 
             // console.log(e.nativeEvent.contentOffset.y)
@@ -186,12 +233,18 @@ export default class DetailArticle extends Component {
               }
             }}/> */}
             
-            <AutoHeightWebView
-              source={{ html: this.state.html }}
-              onMessage={(e) => this.onMessage(e)}
-              // customScript={this.state.script}
-            />
-          </ScrollView>
+          <AutoHeightWebView
+            source={{ html: this.state.html }}
+            onMessage={(e) => this.onMessage(e)}
+            onLoad={() => {
+              this.timer = setTimeout(() => {
+                this.setState({
+                  opn: 0,
+                })
+              }, 2000);}}
+            // customScript={`document.body.style.background = 'lightyellow';`}
+          />
+        </ScrollView>
       </View>
     );
   }
@@ -218,7 +271,6 @@ export default class DetailArticle extends Component {
         }
         if (videoArr !== undefined && videoArr.length> 0) {
           for (let i = 0; i < videoArr.length;i++) {
-            console.log(videoArr[i].ref);
             bodyHtml = bodyHtml.replace(videoArr[i].ref, '<video controls width="100%"  poster="' + videoArr[i]['cover']+'"><source src="' + videoArr[i]['mp4_url'] +'" type="video/mp4"/></video> ')
           }
         }
@@ -230,6 +282,7 @@ export default class DetailArticle extends Component {
           articleInfo: allData,
           html: headerHtml + bodyHtml + scripthtml,
           
+          
         });
         // console.log(this.state.html)
       })
@@ -237,73 +290,73 @@ export default class DetailArticle extends Component {
         console.log(error)
       })
       .done(()=>this.setState({
-        loaded: true
+        loaded: true,
       }))
   }
 }
 const styles = StyleSheet.create({
   headerRightStyle: {
-    borderTopWidth: .7,
-    borderLeftWidth: 1,
-    borderRightWidth: 1,
-    borderBottomWidth: .7,
+    borderTopWidth: scaleSize(1),
+    borderLeftWidth: scaleSize(1),
+    borderRightWidth: scaleSize(1),
+    borderBottomWidth: scaleSize(1),
     borderColor: 'rgb(255,8,42)',
     borderStyle: 'solid',
     borderRadius: 20,
     position: 'absolute',
-    top: 26,
-    right: 13,
+    top: scaleSize(52),
+    right: scaleSize(26),
     justifyContent: 'center',
     alignItems: 'center',
-    height:25,
-    paddingLeft:5,
-    paddingRight: 5,
+    height: scaleSize(50),
+    paddingLeft: scaleSize(10),
+    paddingRight: scaleSize(10),
     
   },
   headerLeftStyle: {
     position: 'absolute',
-    top: 26,
-    left:10
+    top: scaleSize(52),
+    left: scaleSize(20)
   },
   Detailheader: {
-    height: 64,
+    height: scaleSize(128),
     backgroundColor: '#fff',
   },
   articleTitle: {
-    fontSize: 24,
+    fontSize:setSpText(24),
     fontWeight:'500',
     color: '#000',
-    paddingLeft: 13,
-    paddingRight: 13,
+    paddingLeft: scaleSize(26),
+    paddingRight: scaleSize(26),
   },
   pubsourcontainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    paddingLeft:13,
-    paddingRight:13,
-    marginTop:17,
+    paddingLeft: scaleSize(26),
+    paddingRight: scaleSize(26),
+    marginTop: scaleSize(34),
 
   }, 
   orderarc: {
     backgroundColor: 'rgb(255,8,42)',
-    paddingLeft:30,
-    paddingRight:30,
+    paddingLeft: scaleSize(60),
+    paddingRight: scaleSize(60),
     borderRadius: 100,
     justifyContent: 'center',
     alignItems: 'center',
   },
   orderText: {
     color: '#fff',
-    fontSize: 14,
+    fontSize: setSpText(14),
     fontWeight: 'bold'
   },
   arcptimetext: {
     color: 'rgb(175,175,175)',
-    fontSize: 12
+    fontSize: setSpText(12)
   },
   backgroundVideo: {
-    width: width-26,
-    height:198,
+    width: width - scaleSize(52),
+    height: scaleSize(396),
   },
   webview: {
     overflow: 'hidden',

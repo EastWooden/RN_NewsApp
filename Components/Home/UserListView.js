@@ -22,6 +22,9 @@ import { TabNavigator } from 'react-navigation';
 import HomeHeader from './HomeHeader';
 import MainStyle from '../../MainStyle/MainStyle';
 import DetailArticle from './DetailArticle';
+import VideoImage from './VideoImage';
+import PhotosetImage from './PhotosetImage';
+import DeImage from './DeImage';
 let width = Dimensions.get('window').width;
 export default class UserListView extends Component {
   constructor(props){
@@ -33,11 +36,16 @@ export default class UserListView extends Component {
       loaded: false,
       newListData:[],
       isRefreshing: false,
+      defaultImage:'defaultPIC',
+      imageIsLoaded:false,
     }
    
   }
   componentDidMount() {
     this.fetchData();
+  }
+  componentWillUnmount() {
+    // clearTimeout(this.timer);
   }
   render() {
     if(!this.state.loaded) {
@@ -53,7 +61,7 @@ export default class UserListView extends Component {
         renderItem={({ index,item }) => this._renderListItem(index,item)}
         ListFooterComponent={this._ListFooterComponent}
         onEndReached={this._onEndReached.bind(this)}
-        onEndReachedThreshold={0}
+        onEndReachedThreshold={0.5}
         refreshControl={
           <RefreshControl
             refreshing={this.state.isRefreshing}
@@ -85,12 +93,13 @@ export default class UserListView extends Component {
       }
       this.setState({
         ListData: resultData,
-        loaded: true
+        loaded: true,
       })
     })
     .catch(error => {
       console.log(error)
     })
+    
   }
   // 获取更多数据
   fetchMoreData() {
@@ -107,7 +116,7 @@ export default class UserListView extends Component {
         }
         this.setState({
           newListData: resultData,
-          loaded: true
+          loaded: true,
         })
       })
       .catch(error => {
@@ -136,12 +145,16 @@ export default class UserListView extends Component {
       for (let i = 0; i < 3; i++) {
         threeImageArr.push(
           <View key={i}>
-            <Image source={{ uri: item.imgnewextra[i].imgsrc }} style={{ width: (width - scaleSize(60)) / 3, height: scaleSize(144) }} />
+              <DeImage
+                defaultImage={{uri:this.state.defaultImage}} 
+                source={{ uri: item.imgnewextra[i].imgsrc}}
+                style={{ width: (width - scaleSize(60)) / 3, height: scaleSize(144), }}
+              />
           </View>
         ); 
       }
       return (
-        <TouchableOpacity
+        <TouchableOpacity                //渲染图片数大于三的文章列表
           activeOpacity={0.8}
           onPress={() => this.renderDetialArticle(item)}
         >
@@ -166,19 +179,82 @@ export default class UserListView extends Component {
           </View>
         </TouchableOpacity>
       );
-    }
-    return (
-      <TouchableOpacity
-        // underlayColor = 'rgba(0,102,204,.3)'
-        activeOpacity={0.8}
-        onPress={() => this.renderDetialArticle(item)}
-      >
-        <View style={styles.itemContainer}>
-          <View style={styles.infoContainer}>
-            <View>
-              <Text style={styles.titleText}>{item.title}</Text>
+    } else if (item.TAG == '视频' && index % 2 == 0) {     //渲染索引为偶数的视频列表
+        return (
+          <TouchableOpacity
+            // underlayColor = 'rgba(0,102,204,.3)'
+            activeOpacity={0.8}
+            onPress={() => this.renderDetialArticle(item)}
+          >
+            <View style={[styles.itemContainer,{flexDirection: 'column'}]}>
+              <View>
+                  <Text style={[styles.titleText,{paddingBottom:scaleSize(26)}]}>{item.title}</Text>
+              </View>
+              <View style={styles.videopiccontainer}>
+                <VideoImage 
+                  VideoImageSrc={{ uri: item.imgsrc ? item.imgsrc :'defaultPIC'}} 
+                  style={{width: width-scaleSize(52),height:scaleSize(354)}}
+                />
+              </View>
+              <View style={[styles.publicInfo, { paddingTop: scaleSize(26)}]}>
+                  <Text style={styles.pubinfotext}>
+                    {item.source}
+                  </Text>
+                  <Text style={styles.pubinfotext}>
+                    {hours}
+                  </Text>
+                  <Text style={styles.pubinfotext}>
+                    {item.replyCount}跟帖
+                </Text>
+                </View>
             </View>
-            <View style={styles.publicInfo}>
+          </TouchableOpacity>
+        );
+    } else if (item.TAG == '视频' && index % 2 !== 0) {   //渲染索引为奇数的视频列表
+      return (
+        <TouchableOpacity
+          // underlayColor = 'rgba(0,102,204,.3)'
+          activeOpacity={0.8}
+          onPress={() => this.renderDetialArticle(item)}
+        >
+          <View style={styles.itemContainer}>
+            <View style={styles.infoContainer}>
+              <View style={styles.lefttitlebox}>
+                <Text style={styles.titleText}>{item.title}</Text>
+              </View>
+              <View style={styles.publicInfo}>
+                <Text style={styles.pubinfotext}>
+                  {item.source}
+                </Text>
+                <Text style={styles.pubinfotext}>
+                  {hours}
+                </Text>
+                <Text style={styles.pubinfotext}>
+                  {item.replyCount}跟帖
+                </Text>
+              </View>
+            </View>
+            <View>
+              <VideoImage VideoImageSrc={{ uri: item.imgsrc }} style={{ width: scaleSize(230), height: scaleSize(144) }} />
+            </View>
+          </View>
+        </TouchableOpacity>
+      );
+    } else if (item.tag == 'photoset') {       //渲染图集列表
+      return (
+        <TouchableOpacity
+          // underlayColor = 'rgba(0,102,204,.3)'
+          activeOpacity={0.8}
+          onPress={() => this.renderDetialArticle(item)}
+        >
+          <View style={[styles.itemContainer, { flexDirection: 'column' }]}>
+            <View>
+              <Text style={[styles.titleText, { paddingBottom: scaleSize(26) }]}>{item.title}</Text>
+            </View>
+            <View style={styles.videopiccontainer}>
+              <PhotosetImage imgsum={item.imgsum} photosetImageSrc={{ uri: item.imgsrc }} style={{ width: width - scaleSize(52), height: scaleSize(354) }}/>
+            </View>
+            <View style={[styles.publicInfo, { paddingTop: scaleSize(26) }]}>
               <Text style={styles.pubinfotext}>
                 {item.source}
               </Text>
@@ -187,15 +263,46 @@ export default class UserListView extends Component {
               </Text>
               <Text style={styles.pubinfotext}>
                 {item.replyCount}跟帖
-            </Text>
+                </Text>
             </View>
           </View>
-          <View>
-            <Image source={{ uri: item.imgsrc }} style={{ width: scaleSize(230), height: scaleSize(144) }} />
+        </TouchableOpacity>
+      );
+    } else {
+      return (
+        <TouchableOpacity
+          // underlayColor = 'rgba(0,102,204,.3)'
+          activeOpacity={0.8}
+          onPress={() => this.renderDetialArticle(item)}
+        >
+          <View style={styles.itemContainer}>
+            <View style={styles.infoContainer}>
+              <View style={styles.lefttitlebox}>
+                <Text style={styles.titleText}>{item.title}</Text>
+              </View>
+              <View style={styles.publicInfo}>
+                <Text style={styles.pubinfotext}>
+                  {item.source}
+                </Text>
+                <Text style={styles.pubinfotext}>
+                  {hours}
+                </Text>
+                <Text style={styles.pubinfotext}>
+                  {item.replyCount}跟帖
+                </Text>
+              </View>
+            </View>
+            <View>
+              <DeImage
+                defaultImage= {{uri:this.state.defaultImage}}
+                source={{ uri: item.imgsrc }}
+                style={{ width: scaleSize(230), height: scaleSize(144) }} />
+            </View>
           </View>
-        </View>
-      </TouchableOpacity>
-    );
+        </TouchableOpacity>
+      );
+    }
+
   }
   // _keyExtractor(index,item) {
   //   return item.id
@@ -215,9 +322,12 @@ export default class UserListView extends Component {
     this.setState({
       size: 10
     })
-    setTimeout(() => {
+    this.timer = setTimeout(() => {
       this.fetchMoreData();
       this.state.ListData = this.state.ListData.concat(this.state.newListData);
+      this.setState({
+        imageIsLoaded: true,
+      })
     }, 300);
    
   }
@@ -234,12 +344,12 @@ export default class UserListView extends Component {
 const styles = StyleSheet.create({
   pubinfotext: {
     color: 'rgb(175,175,175)',
-    marginRight: scaleSize(20),
+    marginRight: scaleSize(10),
     fontSize: setSpText(14),
-    textAlignVertical: 'center'
   },
   publicInfo: {
-    flexDirection: 'row'
+    flexDirection: 'row',
+    overflow:'hidden',
   },
   titleText:{
     fontSize: setSpText(16),
@@ -268,5 +378,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     overflow: 'hidden'
     // flex: 1
+  },
+  lefttitlebox: {
+    height:scaleSize(84),
+    overflow:'hidden',
   }
 });

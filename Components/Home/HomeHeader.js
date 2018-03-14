@@ -13,6 +13,7 @@ import {
   TextInput,
   Image,
   Dimensions,
+  ProgressViewIOS
 } from 'react-native';
 import { setSpText, scaleSize } from '../../ScreenUtil/ScreenUtil'
 import { TabNavigator } from 'react-navigation';
