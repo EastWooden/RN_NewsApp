@@ -15,13 +15,14 @@ import {
   Dimensions,
   TouchableOpacity
 } from 'react-native';
-import { TabNavigator,TabBarTop,StackNavigator } from 'react-navigation';
+import { TabNavigator, TabBarTop, StackNavigator, TabBarBottom } from 'react-navigation';
 import {scaleSize,setSpText} from '../../ScreenUtil/ScreenUtil'
 import HomeHeader from './HomeHeader';
 import UserListView from './UserListView';
 import MainStyle from '../../MainStyle/MainStyle';
 import TabBarItem from '../TabBarItem/TabBarItem';
 import DetailArticle from './DetailArticle';
+import videoDetail from './videoDetail';
 import icons from '../../icons/icons';
 let width = Dimensions.get('window').width;
 export default class Home extends Component {
@@ -36,6 +37,7 @@ const TabRouteConfigs = {
     screen: UserListView,
     navigationOptions: ({navigation}) => ({
       tabBarLabel: '头条',
+
     })
   },
   video: {
@@ -146,6 +148,9 @@ const StackRouteConfigs = {
   },
   DetailArticle: {
     screen: DetailArticle,
+  },
+  videoDetail: {
+    screen: videoDetail,
   }
 };
 const StackNavigatorConfigs  = {

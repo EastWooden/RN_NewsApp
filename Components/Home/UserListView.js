@@ -38,8 +38,7 @@ export default class UserListView extends Component {
       isRefreshing: false,
       defaultImage:'defaultPIC',
       imageIsLoaded:false,
-    }
-   
+    } 
   }
   componentDidMount() {
     this.fetchData();
@@ -73,7 +72,6 @@ export default class UserListView extends Component {
             progressBackgroundColor="#ffff00"
           />
         }
-
             // keyExtractor={this._keyExtractor}
       />
     );
@@ -184,7 +182,7 @@ export default class UserListView extends Component {
           <TouchableOpacity
             // underlayColor = 'rgba(0,102,204,.3)'
             activeOpacity={0.8}
-            onPress={() => this.renderDetialArticle(item)}
+            onPress={() => this.renderVideDetail(item)}
           >
             <View style={[styles.itemContainer,{flexDirection: 'column'}]}>
               <View>
@@ -215,7 +213,7 @@ export default class UserListView extends Component {
         <TouchableOpacity
           // underlayColor = 'rgba(0,102,204,.3)'
           activeOpacity={0.8}
-          onPress={() => this.renderDetialArticle(item)}
+          onPress={() => this.renderVideDetail(item)}
         >
           <View style={styles.itemContainer}>
             <View style={styles.infoContainer}>
@@ -339,6 +337,9 @@ export default class UserListView extends Component {
   renderDetialArticle(item) {
     // console.log(this.props.navigation)
     this.props.navigation.navigate('DetailArticle',{ item } )
+  }
+  renderVideDetail(item) {
+    this.props.navigation.navigate('videoDetail', { item })
   }
 }
 const styles = StyleSheet.create({

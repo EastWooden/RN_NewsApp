@@ -20,9 +20,12 @@ import Vscreen from '../VideoScreen/Vscreen';
 import LiveCast from '../LiveBordcast/LiveCast';
 import TabBarItem from '../TabBarItem/TabBarItem';
 export default class Main extends Component {
+  constructor(props) {
+    super(props);
+  }
   render() {
     return (
-      <Navigator />
+      <Navigator/>
     );
   }
 }
@@ -30,6 +33,7 @@ const TabRouteConfigs = {
   Home: { 
           screen: Home,
           navigationOptions: ({navigation}) => ({
+            tabBarVisible: true,
             tabBarLabel: '首页',
             tabBarIcon: ({focused ,tintColor}) => (
               <TabBarItem
@@ -110,7 +114,6 @@ const StackNavigatorConfigs = {
   initialRouteNam: 'Tab',
   navigationOptions: {
     header:null,
-   
   }
 };
 const Navigator = StackNavigator(StackRouteConfigs, StackNavigatorConfigs)

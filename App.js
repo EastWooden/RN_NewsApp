@@ -13,12 +13,13 @@ import {
 } from 'react-native';
 
 import Main from './Components/Main/Main'
+import Home from './Components/Home/Home'
 
 
 export default class App extends Component {
   render() {
     return (
-      <Main />
+      <Main />      
     );
   }
 }
