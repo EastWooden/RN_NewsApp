@@ -19,9 +19,21 @@ import Mine from '../Mine/Mine';
 import Vscreen from '../VideoScreen/Vscreen';
 import LiveCast from '../LiveBordcast/LiveCast';
 import TabBarItem from '../TabBarItem/TabBarItem';
-export default class Main extends Component {
+import store from '../../store';
+import { isshowtab } from '../../actions/actions';
+import { connect } from 'react-redux';
+class Main extends Component {
   constructor(props) {
     super(props);
+    
+  }
+  componentDidMount () {
+    this.props.dispatch(isshowtab());
+    console.log(this.props.isShowtab.isShowtab)
+    // console.log(this.props.navigation)
+    // this.props.navigation.setParams({
+    //   isShowtab: this.props.isShowtab.isShowtab,
+    // })
   }
   render() {
     return (
@@ -33,7 +45,6 @@ const TabRouteConfigs = {
   Home: { 
           screen: Home,
           navigationOptions: ({navigation}) => ({
-            tabBarVisible: true,
             tabBarLabel: '首页',
             tabBarIcon: ({focused ,tintColor}) => (
               <TabBarItem
@@ -120,3 +131,11 @@ const Navigator = StackNavigator(StackRouteConfigs, StackNavigatorConfigs)
 const styles = StyleSheet.create({
   
 });
+
+
+
+const mapStateToProps = state => ({
+  isShowtab: state.showTab
+})
+
+export default connect(mapStateToProps)(Main);

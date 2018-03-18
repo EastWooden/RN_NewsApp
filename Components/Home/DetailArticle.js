@@ -27,10 +27,12 @@ import MainStyle from '../../MainStyle/MainStyle';
 import icons  from '../../icons/icons';
 import AutoHeightWebView from 'react-native-autoheight-webview';
 import {scaleSize,setSpText} from '../../ScreenUtil/ScreenUtil';
+import { connect } from 'react-redux';
+import { isshowtab } from '../../actions/actions'
 var TimerMixin = require('react-timer-mixin');
 let width = Dimensions.get('window').width;
 let height = Dimensions.get('window').height;
-export default class DetailArticle extends Component {
+class DetailArticle extends Component {
   constructor(props){
     super(props);
     this.state = {
@@ -92,7 +94,8 @@ export default class DetailArticle extends Component {
     //   navigatePress: () => this.props.navigation.goBack(),
     //   gentie: this.props.navigation.state.params.item.replyCount
     // })
-    console.log(this.state.opn);
+    this.props.dispatch(isshowtab());
+    console.log(this.props.isShowtab.isShowtab);
     this.fetchData();
     Animated.timing(this.state.progressWidth,{  //显示加载webview加载控制条
       toValue: 1,
@@ -369,3 +372,10 @@ const styles = StyleSheet.create({
   //   height: height
   // }
 });
+
+
+const mapStateToProps = state => ({
+  isShowtab: state.showTab
+})
+
+export default connect(mapStateToProps)(DetailArticle);

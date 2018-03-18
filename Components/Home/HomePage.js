@@ -16,7 +16,7 @@ import {
   TouchableOpacity
 } from 'react-native';
 import { TabNavigator, TabBarTop, StackNavigator, TabBarBottom } from 'react-navigation';
-import {scaleSize,setSpText} from '../../ScreenUtil/ScreenUtil'
+import { scaleSize, setSpText } from '../../ScreenUtil/ScreenUtil'
 import HomeHeader from './HomeHeader';
 import UserListView from './UserListView';
 import MainStyle from '../../MainStyle/MainStyle';
@@ -24,38 +24,21 @@ import TabBarItem from '../TabBarItem/TabBarItem';
 import DetailArticle from './DetailArticle';
 import videoDetail from './videoDetail';
 import icons from '../../icons/icons';
-import { connect } from 'react-redux';
-import { isshowtab } from '../../actions/actions'
 let width = Dimensions.get('window').width;
-class Home extends Component {
-  constructor(props) {
-    super(props);
-  }
+export default class HomePage extends Component {
   static navigationOptions = ({ navigation, screenProps }) => ({
-    // tabBarVisible: navigation.state.params.hah, 
+    tabBarVisible: false,
   })
-  componentDidMount () {
-    console.log(this.props.navigation)
-    this.props.dispatch(isshowtab());
-    let _this = this;
-    this.props.navigation.setParams({
-      'hah': 11,
-    })
-    console.log(this.props.navigation.state)
-    console.log(this.props.isShowtab.isShowtab);
-    
-    
-  }
   render() {
-    return (      
-        <TopNavigator />
+    return (
+      <TopNavigator />
     );
   }
 }
 const TabRouteConfigs = {
   Toutiao: {
     screen: UserListView,
-    navigationOptions: ({navigation}) => ({
+    navigationOptions: ({ navigation }) => ({
       tabBarLabel: '头条',
 
     })
@@ -126,9 +109,9 @@ const TabNavigatorConfigs = {
   initialRouteName: 'Toutiao',
   tabBarComponent: TabBarTop,
   tabBarPosition: 'top',
-  lazy:true,
-  swipeEnabled:true,
-  animationEnabled:false,
+  lazy: true,
+  swipeEnabled: true,
+  animationEnabled: false,
   tabBarOptions: {
     activeTintColor: 'rgb(0,0,0)',
     inactiveTintColor: '#555',
@@ -137,7 +120,7 @@ const TabNavigatorConfigs = {
     style: {
       backgroundColor: '#fff',
       borderWidth: 0,
-      paddingTop:0,
+      paddingTop: 0,
       // position:'absolute',
       // top:64,
       // left: 0, 
@@ -173,19 +156,13 @@ const StackRouteConfigs = {
     screen: videoDetail,
   }
 };
-const StackNavigatorConfigs  = {
+const StackNavigatorConfigs = {
   initialRouteName: 'Tab',
   // navigationOptions: {
   // }
-  
+
 };
 const TopNavigator = StackNavigator(StackRouteConfigs, StackNavigatorConfigs)
 const styles = StyleSheet.create({
-  
+
 });
-
-const mapStateToProps = state => ({
-  isShowtab: state.showTab
-})
-
-export default connect(mapStateToProps)(Home);

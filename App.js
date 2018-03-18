@@ -12,14 +12,17 @@ import {
   View
 } from 'react-native';
 
-import Main from './Components/Main/Main'
-import Home from './Components/Home/Home'
-
-
+import Main from './Components/Main/Main';
+import Home from './Components/Home/Home';
+import store from './store';
+import { Provider } from 'react-redux';
 export default class App extends Component {
+  
   render() {
     return (
-      <Main />      
+      <Provider store = {store}>
+        <Main /> 
+      </Provider>     
     );
   }
 }

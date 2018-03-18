@@ -15,6 +15,7 @@ import { TabNavigator } from 'react-navigation';
 
 import MainStyle from '../../MainStyle/MainStyle'
 export default class Mine extends Component {
+  
   render() {
     return (
       <View style={MainStyle.container}>

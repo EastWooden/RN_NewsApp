@@ -19,7 +19,9 @@ import { scaleSize, setSpText,width } from '../../ScreenUtil/ScreenUtil';
 import MainStyle from '../../MainStyle/MainStyle';
 import icons from '../../icons/icons';
 import Video from 'react-native-video';
-export default class VideoDetail extends Component {
+import { connect } from 'react-redux';
+import { isshowtab } from '../../actions/actions'
+class VideoDetail extends Component {
   constructor(props){
     super(props);
     this.state={
@@ -32,19 +34,23 @@ export default class VideoDetail extends Component {
     }
     console.log(this.props.navigation); 
     console.log(this.props.navigation.state.params.item);  //获取的列表页传来的数据信息
+    console.log(this.props.showTab.isShowtab);
 
     //获取服务器数据
     this.fetcthData();
   }
   //组件挂载之后，设置navigation的参数，之后才能在static navigation中是用方法，和变量参数
   componentDidMount() {
+    this.props.dispatch(isshowtab());
+    console.log(this.props.navigation)
     this.props.navigation.setParams({
       navigatePress: () => this.props.navigation.goBack(),
-      isShowTab: false
     })
+    console.log(this.props.isShowtab.isShowtab);
   }
   //定义导航选项
   static navigationOptions = ({ navigation, screenProps }) => ({
+    tabBarVisible: false,
     headerTitle: '更多视频',
     //顶部标题栏文字的样式
     headerTitleStyle: {
@@ -174,9 +180,7 @@ export default class VideoDetail extends Component {
       </View>
     );
   }
-  
 }
-
 const styles = StyleSheet.create({
   videoitemstyle: {
     width: width,
@@ -191,3 +195,9 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(17,17,17,1)'
   }
 });
+
+const mapStateToProps = state => ({
+  isShowtab: state.showTab
+})
+
+export default connect(mapStateToProps)(VideoDetail);
