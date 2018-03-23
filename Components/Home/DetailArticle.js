@@ -54,10 +54,10 @@ class DetailArticle extends Component {
       progressOpacity: new Animated.Value(0),
       progressWidth: new Animated.Value(0),
       opn:scaleSize(2),
-      
+
     };
   }
-  
+
   static navigationOptions = ({ navigation, screenProps }) => ({
     //左侧标题
     // headerTitle: '我是详细文章页面',
@@ -68,10 +68,10 @@ class DetailArticle extends Component {
     //设置跳转页面左侧返回箭头后面的文字，默认是上一个页面的标题
     headerBackTitle: null,
     // headerLeft: (
-      
+
     // ),
     // headerRight: (
-      
+
     // ),
     header: null,
     //顶部标题栏的样式
@@ -79,7 +79,7 @@ class DetailArticle extends Component {
       backgroundColor: '#fff',
       borderBottomWidth: 0,
     },
-   
+
   })
   onMessage(e) {
     if (this.WebView) {
@@ -89,35 +89,19 @@ class DetailArticle extends Component {
     console.log(e.nativeEvent.data);
   }
   componentDidMount() {
-    //在static中使用this方法  
-    // this.props.navigation.setParams({
-    //   navigatePress: () => this.props.navigation.goBack(),
-    //   gentie: this.props.navigation.state.params.item.replyCount
-    // })
-    this.props.dispatch(isshowtab());
+    //在static中使用this方法
     console.log(this.props.isShowtab.isShowtab);
+    console.log(this.props.navigation);
     this.fetchData();
     Animated.timing(this.state.progressWidth,{  //显示加载webview加载控制条
       toValue: 1,
       duration:2000,
       Easing: Easing.bezier(.25,.79,.87,.31),
     }).start()
-    // this.updateProgress();
   }
   componentWillUnmount () {
     clearTimeout(this.timer)
   }
-  // updateProgress() {
-  //   var webloadprogress = this.state.webloadprogress + 0.01;
-  //   if (webloadprogress == 0.9) {
-  //     cancelAnimationFrame(this.requestAni)
-  //   }
-  //   this.setState({ webloadprogress, });
-  //   this.requestAni=setInterval(() => {
-  //     this.updateProgress();
-  //   },100);
-   
-  // }
   render() {
     const { goBack,state } = this.props.navigation;
     let timing = Animated.timing;
@@ -132,13 +116,13 @@ class DetailArticle extends Component {
       <View style={MainStyle.colorwhite}>
         <View style={styles.Detailheader}>
           {/* 顶部左边返回按钮 */}
-          <TouchableOpacity onPress={() => goBack()} activeOpacity={1}>  
+          <TouchableOpacity onPress={() => { goBack(); }} activeOpacity={1}>
             <View style={styles.headerLeftStyle}>
               <Image source={{ uri: icons.back }} style={{ width: scaleSize(50), height: scaleSize(50), tintColor: '#555' }} />
             </View>
           </TouchableOpacity>
           {/* 顶部右边跟帖数量 */}
-          <Animated.View style={[styles.headerRightStyle, {   
+          <Animated.View style={[styles.headerRightStyle, {
               width: this.state.widthAnima.interpolate({
                 inputRange: [0, 1],
                 outputRange: [scaleSize(200), scaleSize(400)]
@@ -191,11 +175,11 @@ class DetailArticle extends Component {
             }}>
           </Animated.View>
         </View>
-    
+
           <ScrollView
-            onScroll={(e) => { 
+            onScroll={(e) => {
             // console.log(e.nativeEvent.contentOffset.y)
-            if (e.nativeEvent.contentOffset.y >= 105.5) {
+            if (e.nativeEvent.contentOffset.y >= 105) {
               Animated.parallel(['fadeAnima1', 'fadeAnima', 'widthAnima', 'backgroundColorAnima', 'fontColorAnima'].map((property) => {
                 return timing(this.state[property], {
                   toValue: 1,
@@ -212,7 +196,7 @@ class DetailArticle extends Component {
                 });
               })).start();
             }
-          
+
           }}
             scrollEventThrottle={0.5}
           >
@@ -235,7 +219,7 @@ class DetailArticle extends Component {
                 })
               }
             }}/> */}
-            
+
           <AutoHeightWebView
             source={{ html: this.state.html }}
             onMessage={(e) => this.onMessage(e)}
@@ -284,8 +268,8 @@ class DetailArticle extends Component {
         this.setState({
           articleInfo: allData,
           html: headerHtml + bodyHtml + scripthtml,
-          
-          
+
+
         });
         // console.log(this.state.html)
       })
@@ -314,7 +298,7 @@ const styles = StyleSheet.create({
     height: scaleSize(50),
     paddingLeft: scaleSize(10),
     paddingRight: scaleSize(10),
-    
+
   },
   headerLeftStyle: {
     position: 'absolute',
@@ -339,7 +323,7 @@ const styles = StyleSheet.create({
     paddingRight: scaleSize(26),
     marginTop: scaleSize(34),
 
-  }, 
+  },
   orderarc: {
     backgroundColor: 'rgb(255,8,42)',
     paddingLeft: scaleSize(60),

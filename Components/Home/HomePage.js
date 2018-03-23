@@ -24,11 +24,27 @@ import TabBarItem from '../TabBarItem/TabBarItem';
 import DetailArticle from './DetailArticle';
 import videoDetail from './videoDetail';
 import icons from '../../icons/icons';
+import { connect } from 'react-redux';
+import { isshowtab } from '../../actions/actions';
 let width = Dimensions.get('window').width;
-export default class HomePage extends Component {
+class HomePage extends Component {
   static navigationOptions = ({ navigation, screenProps }) => ({
-    tabBarVisible: false,
+    tabBarVisible: true,
   })
+  componentDidMount () {
+    console.log(this.props.isShowtab.isShowtab)
+    this.props.dispatch(isshowtab());
+    if (this.props.navigation.state.routeName == "DetailArticle") {
+      this.props.navigation.setParams({
+        hah: false
+      })
+    } else {
+      this.props.navigation.setParams({
+        hah: true
+      })
+    }
+
+  }
   render() {
     return (
       <TopNavigator />
@@ -123,7 +139,7 @@ const TabNavigatorConfigs = {
       paddingTop: 0,
       // position:'absolute',
       // top:64,
-      // left: 0, 
+      // left: 0,
     },
     tabStyle: {                  //单个Tab的样式
       width: scaleSize(146),
@@ -144,7 +160,7 @@ const StackRouteConfigs = {
     screen: Tab,
     navigationOptions: {
       header: (
-        // 
+        //
         <HomeHeader />
       ),
     }
@@ -166,3 +182,9 @@ const TopNavigator = StackNavigator(StackRouteConfigs, StackNavigatorConfigs)
 const styles = StyleSheet.create({
 
 });
+
+const mapStateToProps = state => ({
+  isShowtab: state.showTab
+})
+
+export default connect(mapStateToProps)(HomePage);

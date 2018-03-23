@@ -15,7 +15,7 @@ import {
   Dimensions,
   TouchableOpacity
 } from 'react-native';
-import { TabNavigator, TabBarTop, StackNavigator, TabBarBottom } from 'react-navigation';
+import { TabNavigator, TabBarTop, StackNavigator, TabBarBottom,NavigationActions } from 'react-navigation';
 import {scaleSize,setSpText} from '../../ScreenUtil/ScreenUtil'
 import HomeHeader from './HomeHeader';
 import UserListView from './UserListView';
@@ -24,6 +24,10 @@ import TabBarItem from '../TabBarItem/TabBarItem';
 import DetailArticle from './DetailArticle';
 import videoDetail from './videoDetail';
 import icons from '../../icons/icons';
+import Vscreen from '../VideoScreen/Vscreen';
+import Mine from '../Mine/Mine';
+import LiveCast from '../LiveBordcast/LiveCast';
+import HomePage from './HomePage'
 import { connect } from 'react-redux';
 import { isshowtab } from '../../actions/actions'
 let width = Dimensions.get('window').width;
@@ -31,139 +35,100 @@ class Home extends Component {
   constructor(props) {
     super(props);
   }
+
   static navigationOptions = ({ navigation, screenProps }) => ({
-    // tabBarVisible: navigation.state.params.hah, 
+
   })
   componentDidMount () {
     console.log(this.props.navigation)
-    this.props.dispatch(isshowtab());
-    let _this = this;
-    this.props.navigation.setParams({
-      'hah': 11,
-    })
-    console.log(this.props.navigation.state)
-    console.log(this.props.isShowtab.isShowtab);
-    
-    
   }
   render() {
-    return (      
-        <TopNavigator />
+    return (
+        <Navigator />
     );
   }
 }
-const TabRouteConfigs = {
-  Toutiao: {
-    screen: UserListView,
-    navigationOptions: ({navigation}) => ({
-      tabBarLabel: '头条',
 
+const TabRouteConfigs = {
+  HomePage: {
+    screen: UserListView,
+    navigationOptions: ({ navigation }) => ({
+      tabBarLabel: '首页',
+      tabBarIcon: ({ focused, tintColor }) => (
+        <TabBarItem
+          tintColor={tintColor}
+          focused={focused}
+          normalImage={{ uri: 'home' }}
+          selectedImage={{ uri: 'activity_home' }}
+        />
+      )
     })
   },
-  video: {
-    screen: UserListView,
-    navigationOptions: {
+  Vscreen: {
+    screen: Vscreen,
+    navigationOptions: ({ navigation }) => ({
       tabBarLabel: '视频',
-    }
+      tabBarIcon: ({ focused, tintColor }) => (
+        <TabBarItem
+          tintColor={tintColor}
+          focused={focused}
+          normalImage={{ uri: 'playon' }}
+          selectedImage={{ uri: 'playon_fill' }}
+        />
+      )
+    })
   },
-  newTime: {
-    screen: UserListView,
-    navigationOptions: {
-      tabBarLabel: '新时代',
-    }
+  LiveCast: {
+    screen: LiveCast,
+    navigationOptions: ({ navigation }) => ({
+      tabBarLabel: '直播',
+      tabBarIcon: ({ focused, tintColor }) => (
+        <TabBarItem
+          tintColor={tintColor}
+          focused={focused}
+          normalImage={{ uri: 'video' }}
+          selectedImage={{ uri: 'video_fill' }}
+        />
+      )
+    })
   },
-  yl: {
-    screen: UserListView,
-    navigationOptions: {
-      tabBarLabel: '娱乐',
-    }
+  Mine: {
+    screen: Mine,
+    navigationOptions: ({ navigation }) => ({
+      tabBarLabel: '我的',
+      tabBarIcon: ({ focused, tintColor }) => (
+        <TabBarItem
+          tintColor={tintColor}
+          focused={focused}
+          normalImage={{ uri: 'mine' }}
+          selectedImage={{ uri: 'mine_active' }}
+        />
+      )
+    })
   },
-  lh: {
-    screen: UserListView,
-    navigationOptions: {
-      tabBarLabel: '两会',
-    }
-  },
-  ty: {
-    screen: UserListView,
-    navigationOptions: {
-      tabBarLabel: '体育',
-    }
-  },
-  yw: {
-    screen: UserListView,
-    navigationOptions: {
-      tabBarLabel: '要闻',
-    }
-  },
-  dz: {
-    screen: UserListView,
-    navigationOptions: {
-      tabBarLabel: '段子',
-    }
-  },
-  wyh: {
-    screen: UserListView,
-    navigationOptions: {
-      tabBarLabel: '网易号',
-    }
-  },
-  local: {
-    screen: UserListView,
-    navigationOptions: {
-      tabBarLabel: '本地',
-    }
-  },
-  cj: {
-    screen: UserListView,
-    navigationOptions: {
-      tabBarLabel: '财经',
-    }
-  },
-
 };
+//定义底部标签的默认配置
 const TabNavigatorConfigs = {
-  initialRouteName: 'Toutiao',
-  tabBarComponent: TabBarTop,
-  tabBarPosition: 'top',
-  lazy:true,
-  swipeEnabled:true,
-  animationEnabled:false,
+  initialRouteName: 'HomePage',
+  tabBarComponent: TabBarBottom,
+  tabBarPosition: 'bottom',
+  lazy: true,
   tabBarOptions: {
-    activeTintColor: 'rgb(0,0,0)',
-    inactiveTintColor: '#555',
-    scrollEnabled: true,
-    pressOpacity: 1,
+    activeTintColor: 'rgb(255,8,42)',
+    inactiveTintColor: 'gray',
     style: {
       backgroundColor: '#fff',
-      borderWidth: 0,
-      paddingTop:0,
-      // position:'absolute',
-      // top:64,
-      // left: 0, 
-    },
-    tabStyle: {                  //单个Tab的样式
-      width: scaleSize(146),
-      padding: 0
-    },
-    labelStyle: {//文字的样式
-      fontSize: setSpText(16),
-    },
-    indicatorStyle: {
-      height: 0,
+      borderTopWidth: 0,
+      paddingBottom: scaleSize(4)
     }
   },
-}
+};
 const Tab = TabNavigator(TabRouteConfigs, TabNavigatorConfigs);
 //定义栈路由
 const StackRouteConfigs = {
   Tab: {
     screen: Tab,
     navigationOptions: {
-      header: (
-        // 
-        <HomeHeader />
-      ),
     }
   },
   DetailArticle: {
@@ -172,17 +137,19 @@ const StackRouteConfigs = {
   videoDetail: {
     screen: videoDetail,
   }
+
 };
 const StackNavigatorConfigs  = {
   initialRouteName: 'Tab',
   // navigationOptions: {
   // }
-  
+
 };
-const TopNavigator = StackNavigator(StackRouteConfigs, StackNavigatorConfigs)
+const Navigator = StackNavigator(StackRouteConfigs, StackNavigatorConfigs)
 const styles = StyleSheet.create({
-  
+
 });
+
 
 const mapStateToProps = state => ({
   isShowtab: state.showTab

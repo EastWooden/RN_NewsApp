@@ -19,21 +19,16 @@ import Mine from '../Mine/Mine';
 import Vscreen from '../VideoScreen/Vscreen';
 import LiveCast from '../LiveBordcast/LiveCast';
 import TabBarItem from '../TabBarItem/TabBarItem';
+import DetailArticle from '../Home/DetailArticle';
+import videoDetail from '../Home/videoDetail';
 import store from '../../store';
 import { isshowtab } from '../../actions/actions';
 import { connect } from 'react-redux';
 class Main extends Component {
   constructor(props) {
     super(props);
-    
   }
   componentDidMount () {
-    this.props.dispatch(isshowtab());
-    console.log(this.props.isShowtab.isShowtab)
-    // console.log(this.props.navigation)
-    // this.props.navigation.setParams({
-    //   isShowtab: this.props.isShowtab.isShowtab,
-    // })
   }
   render() {
     return (
@@ -41,95 +36,22 @@ class Main extends Component {
     );
   }
 }
-const TabRouteConfigs = {
-  Home: { 
-          screen: Home,
-          navigationOptions: ({navigation}) => ({
-            tabBarLabel: '首页',
-            tabBarIcon: ({focused ,tintColor}) => (
-              <TabBarItem
-                tintColor={tintColor}
-                focused = {focused}
-                normalImage={{ uri:'home'}}
-                selectedImage={{ uri:'activity_home'}}
-              />
-            )
-          })
-        },
-  Vscreen: {
-    screen: Vscreen,
-    navigationOptions: ({ navigation }) => ({
-      tabBarLabel: '视频',
-      tabBarIcon: ({ focused, tintColor }) => (
-        <TabBarItem
-          tintColor={tintColor}
-          focused={focused}
-          normalImage={{ uri: 'playon' }}
-          selectedImage={{ uri: 'playon_fill' }}
-        />
-      )
-    })
-  },
-  LiveCast: {
-    screen: LiveCast,
-    navigationOptions: ({ navigation }) => ({
-      tabBarLabel: '直播',
-      tabBarIcon: ({ focused, tintColor }) => (
-        <TabBarItem
-          tintColor={tintColor}
-          focused={focused}
-          normalImage={{ uri: 'video' }}
-          selectedImage={{ uri: 'video_fill' }}
-        />
-      )
-    })
-  },
-  Mine: {
-    screen: Mine,
-    navigationOptions: ({ navigation }) => ({
-      tabBarLabel: '我的',
-      tabBarIcon: ({ focused, tintColor }) => (
-        <TabBarItem
-          tintColor={tintColor}
-          focused={focused}
-          normalImage={{ uri: 'mine' }}
-          selectedImage={{ uri: 'mine_active' }}
-        />
-      )
-    })
-  },
-};
-//定义底部标签的默认配置
-const TabNavigatorConfigs = {
-  initialRouteNam: '首页',
-  tabBarComponent: TabBarBottom,
-  tabBarPosition : 'bottom',
-  lazy: true,
-  tabBarOptions: {
-    activeTintColor: 'rgb(255,8,42)',
-    inactiveTintColor: 'gray',
-    style: {
-      backgroundColor: '#fff',
-      borderTopWidth: 0,
-      paddingBottom: scaleSize(4)
-    }
-  },
-};
-const Tab = TabNavigator(TabRouteConfigs,TabNavigatorConfigs);
 const StackRouteConfigs = {
-  Tab: {
-    screen: Tab,
-  }
+  Home: {
+    screen: Home,
+  },
+
 };
 const StackNavigatorConfigs = {
-  initialRouteNam: 'Tab',
+  initialRouteName: 'Home',
+  initialRouteParams: {hah: false},
   navigationOptions: {
     header:null,
   }
 };
 const Navigator = StackNavigator(StackRouteConfigs, StackNavigatorConfigs)
 const styles = StyleSheet.create({
-  
+
 });
 
 

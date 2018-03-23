@@ -18,15 +18,23 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import { setSpText, scaleSize } from '../../ScreenUtil/ScreenUtil'
-import { TabNavigator } from 'react-navigation';
+import { TabNavigator,TabBarBottom,StackNavigator } from 'react-navigation';
 import HomeHeader from './HomeHeader';
 import MainStyle from '../../MainStyle/MainStyle';
 import DetailArticle from './DetailArticle';
 import VideoImage from './VideoImage';
 import PhotosetImage from './PhotosetImage';
 import DeImage from './DeImage';
+import Home from './Home';
+import Vscreen from '../../Components/VideoScreen/Vscreen';
+import LiveCast from '../../Components/LiveBordcast/LiveCast';
+import Mine from '../../Components/Mine/Mine';
+import { connect } from 'react-redux';
+import { isshowtab } from '../../actions/actions';
+import ScrollableTabView, { ScrollableTabBar } from 'react-native-scrollable-tab-view';
+import HomeScrollableTabBar from './HomeScrollableTabBar';
 let width = Dimensions.get('window').width;
-export default class UserListView extends Component {
+class UserListView extends Component {
   constructor(props){
     super(props);
     this.state = {
@@ -38,10 +46,16 @@ export default class UserListView extends Component {
       isRefreshing: false,
       defaultImage:'defaultPIC',
       imageIsLoaded:false,
-    } 
+    }
   }
+  static navigationOptions = ({ navigation, screenProps }) => ({
+    header: (
+      <HomeHeader />
+    ),
+  })
   componentDidMount() {
     this.fetchData();
+    console.log(this.props.isShowtab.isShowtab)
   }
   componentWillUnmount() {
     // clearTimeout(this.timer);
@@ -51,29 +65,61 @@ export default class UserListView extends Component {
       return (
         <View style={MainStyle.container}>
           <ActivityIndicator />
-        </View> 
+        </View>
       );
     }
     return (
-      <FlatList
-        data={this.state.ListData}
-        renderItem={({ index,item }) => this._renderListItem(index,item)}
-        ListFooterComponent={this._ListFooterComponent}
-        onEndReached={this._onEndReached.bind(this)}
-        onEndReachedThreshold={0.5}
-        refreshControl={
-          <RefreshControl
-            refreshing={this.state.isRefreshing}
-            onRefresh={this._onRefresh.bind(this)}
-            tintColor="#eee"
-            title="Loading..."
-            titleColor="#000"
-            colors={['#ff0000', '#00ff00', '#0000ff']}
-            progressBackgroundColor="#ffff00"
-          />
-        }
+      <ScrollableTabView
+        tabBarUnderlineStyle={{height: 0}}
+        tabBarBackgroundColor = '#fff'
+        tabBarActiveTextColor= '#000'
+        initialPage={0}
+        renderTabBar={() => <ScrollableTabBar />}
+        tabBarTextStyle={{ fontSize: setSpText(16),fontWeight:'400'}}
+        tabBarInactiveTextColor = '#555'
+      >
+            <FlatList
+              tabLabel='头条'
+              data={this.state.ListData}
+              renderItem={({ index, item }) => this._renderListItem(index, item)}
+              ListFooterComponent={this._ListFooterComponent}
+              onEndReached={this._onEndReached.bind(this)}
+              onEndReachedThreshold={0.5}
+              refreshControl={
+                <RefreshControl
+                  refreshing={this.state.isRefreshing}
+                  onRefresh={this._onRefresh.bind(this)}
+                  tintColor="#eee"
+                  title="Loading..."
+                  titleColor="#000"
+                  colors={['#ff0000', '#00ff00', '#0000ff']}
+                  progressBackgroundColor="#ffff00"
+                />
+              }
             // keyExtractor={this._keyExtractor}
-      />
+            />
+        <View tabLabel='视频'>
+          <Text>favorite</Text>
+        </View>
+        <View tabLabel='新时代'>
+          <Text>favorite</Text>
+        </View>
+        <View tabLabel='娱乐'>
+          <Text>favorite</Text>
+        </View>
+        <View tabLabel='两会'>
+          <Text>favorite</Text>
+        </View>
+        <View tabLabel='体育'>
+          <Text>favorite</Text>
+        </View>
+        <View tabLabel='要闻'>
+          <Text>favorite</Text>
+        </View>
+        <View tabLabel='段子'>
+          <Text>favorite</Text>
+        </View>
+      </ScrollableTabView>
     );
   }
   //获取服务器数据
@@ -97,7 +143,7 @@ export default class UserListView extends Component {
     .catch(error => {
       console.log(error)
     })
-    
+
   }
   // 获取更多数据
   fetchMoreData() {
@@ -144,12 +190,12 @@ export default class UserListView extends Component {
         threeImageArr.push(
           <View key={i}>
               <DeImage
-                defaultImage={{uri:this.state.defaultImage}} 
+                defaultImage={{uri:this.state.defaultImage}}
                 source={{ uri: item.imgnewextra[i].imgsrc}}
                 style={{ width: (width - scaleSize(60)) / 3, height: scaleSize(144), }}
               />
           </View>
-        ); 
+        );
       }
       return (
         <TouchableOpacity                //渲染图片数大于三的文章列表
@@ -189,8 +235,8 @@ export default class UserListView extends Component {
                   <Text style={[styles.titleText,{paddingBottom:scaleSize(26)}]}>{item.title}</Text>
               </View>
               <View style={styles.videopiccontainer}>
-                <VideoImage 
-                  VideoImageSrc={{ uri: item.imgsrc ? item.imgsrc :'defaultPIC'}} 
+                <VideoImage
+                  VideoImageSrc={{ uri: item.imgsrc ? item.imgsrc :'defaultPIC'}}
                   style={{width: width-scaleSize(52),height:scaleSize(354)}}
                 />
               </View>
@@ -327,7 +373,7 @@ export default class UserListView extends Component {
         imageIsLoaded: true,
       })
     }, 300);
-   
+
   }
   //下拉刷新
   _onRefresh () {
@@ -335,8 +381,7 @@ export default class UserListView extends Component {
     this.fetchData();
   }
   renderDetialArticle(item) {
-    // console.log(this.props.navigation)
-    this.props.navigation.navigate('DetailArticle',{ item } )
+    this.props.navigation.navigate('DetailArticle',{ item },{hah:false} )
   }
   renderVideDetail(item) {
     this.props.navigation.navigate('videoDetail', { item })
@@ -385,3 +430,9 @@ const styles = StyleSheet.create({
     overflow:'hidden',
   }
 });
+
+const mapStateToProps = state => ({
+  isShowtab: state.showTab
+})
+
+export default connect(mapStateToProps)(UserListView);
