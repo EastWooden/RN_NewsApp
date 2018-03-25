@@ -150,6 +150,7 @@ export default class VideoDetail extends Component {
           <View>
             <TouchableOpacity
               onPress={() => {
+                console.log(item);
                 this.setState({
                   paused: !this.state.paused,
                   itemopacity: this.state.itemopacity == 1 ? 0 : 1,
@@ -194,7 +195,7 @@ export default class VideoDetail extends Component {
                     sliderValue: val,
                     currentTime: data.currentTime
                   })
-                  item.sliderValue = this.state.sliderValue
+                  item.sliderValue = Math.floor(this.state.sliderValue)
                 }}
                 playInBackground={false}
                 playWhenInactive={false}
@@ -216,23 +217,29 @@ export default class VideoDetail extends Component {
                 },
                 { opacity: 1,}]}
               />
-              <Slider
-                ref='slider'
-                style={styles.videosilder}
-                value={item.sliderValue}
-                maximumValue={item.length}
-                step={1}
-                minimumTrackTintColor='rgb(255,8,42)'
-                onValueChange={(value) => {
-                  this.setState({
-                    currentTime: value
-                  })
-                }}
-
-              />
+              <View style={styles.controlsStyle}>
+                <View>
+                  <Text style={{ color: '#fff' }}>{item.sliderValue == undefined ? 0 : item.sliderValue}</Text>
+                </View>
+                <Slider
+                  ref='slider'
+                  style={styles.videosilder}
+                  value={item.sliderValue}
+                  maximumValue={item.length}
+                  step={1}
+                  minimumTrackTintColor='rgb(255,8,42)'
+                  onValueChange={(value) => {
+                    this.setState({
+                      currentTime: value
+                    })
+                  }}
+                />
+                <View>
+                  <Text style={{ color: '#fff' }}>{parseInt(item.length / 60)}:{(item.length / 60 - parseInt(item.length / 60)).toString().substring(2,4)}</Text>
+                </View>
+              </View>
             </TouchableOpacity>
           </View>
-          <Text style={{ color: '#fff' }}>{item.sliderValue}</Text>
           <View style={styles.videoIteminfo}>
             <Text style={styles.videoitemtitle}>
               {item.title}
@@ -343,13 +350,20 @@ const styles = StyleSheet.create({
     right:scaleSize(26)
   },
   videosilder: {
-    position:'absolute',
-    bottom:10,
-    left:0,
+    width:winWidth-scaleSize(200),
+    zIndex:2,
     marginLeft: scaleSize(20),
     marginRight: scaleSize(20),
-    zIndex:2,
-    width: winWidth-scaleSize(40),
+  },
+  controlsStyle: {
+    flexDirection: 'row',
+    position:'absolute',
+    bottom:0,
+    left:0,
+    justifyContent:'space-between',
+    alignItems: 'center',
+    paddingLeft:scaleSize(20),
+    paddingRight: scaleSize(20)
   }
 });
 
