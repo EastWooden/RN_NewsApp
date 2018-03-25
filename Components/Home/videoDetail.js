@@ -228,9 +228,7 @@ export default class VideoDetail extends Component {
                     currentTime: value
                   })
                 }}
-                onSlidingComplete={(value) => {
-                  this.player.seek(value)
-                }}
+
               />
             </TouchableOpacity>
           </View>
