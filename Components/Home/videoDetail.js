@@ -14,12 +14,21 @@ import {
   TouchableOpacity,
   ScrollView,
   FlatList,
+  Alert,
+  Dimensions,
+  Animated,
+  Easing,
+  Slider,
+
 } from 'react-native';
-import { scaleSize, setSpText,width } from '../../ScreenUtil/ScreenUtil';
+import { scaleSize, setSpText, width, height} from '../../ScreenUtil/ScreenUtil';
 import MainStyle from '../../MainStyle/MainStyle';
 import icons from '../../icons/icons';
 import Video from 'react-native-video';
-import DeImage from './DeImage'
+import VideoPlayer from 'react-native-video-controls'
+import DeImage from './DeImage';
+let winWidth = Dimensions.get('window').width;
+let winHeight = Dimensions.get('window').height;
 export default class VideoDetail extends Component {
   constructor(props){
     super(props);
@@ -27,16 +36,29 @@ export default class VideoDetail extends Component {
       VideoFirstInfo:{},
       firstVideoUrl: '',
       VideoListInfo: [],
-      listLength: 2,
+      listLength: 0,
       showFoot: false,
       defaultImage: 'defaultPIC',
       shortList: [],
+      paused:false,
+      itemopacity:0,
+      videoWidth: winWidth,
+      videoHeight: scaleSize(420),
+      videoRotate: '0deg',
+      isFullscreen: false,
+      sliderValue: 0,
+      currentTime: 0,
+      file_duration:0, //视屏长度
     }
     //获取服务器数据
     this.fetcthData();
-    this.slciceList();
+
 
   }
+  componentWillMount = () => {
+    this.slciceList();
+  };
+
   //组件挂载之后，设置navigation的参数，之后才能在static navigation中是用方法，和变量参数
   componentDidMount() {
     this.props.navigation.setParams({
@@ -109,7 +131,6 @@ export default class VideoDetail extends Component {
         <FlatList
           keyExtractor={(item, index) => index}
           getItemLayout={(item, index) => ({ length: scaleSize(660), offset: scaleSize(660) * index, index })}
-          initialNumToRender={2}
           ref={ref => this.fatlist = ref}
           extraData={this.state}
           data={this.state.shortList}
@@ -126,36 +147,113 @@ export default class VideoDetail extends Component {
     return(
       <View >
         <View>
-          <Video source={{ uri: item.mp4_url }}
-            ref={(ref) => {
-              this.player = ref
-            }}
-            poster={item.cover}
-            rate={1.0}
-            volume={1.0}
-            muted={false}
-            paused={true}
-            resizeMode="contain"
-            repeat={false}
-            playInBackground={false}
-            playWhenInactive={false}
-            progressUpdateInterval={250.0}
-            controls={true}
-            style={[styles.videoitemstyle, { opacity: 1 }]}
-          />
+          <View>
+            <TouchableOpacity
+              onPress={() => {
+                this.setState({
+                  paused: !this.state.paused,
+                  itemopacity: this.state.itemopacity == 1 ? 0 : 1,
+                })
+                item.paused = this.state.paused;
+                item.opacity = this.state.itemopacity;
+              }}
+              activeOpacity={1}
+              style={{ justifyContent: 'center',}}
+            >
+              <View style={[styles.displayButton, { opacity: item.opacity === undefined ? 1 : item.opacity}]}>
+                <Image
+                  style={{ tintColor: 'rgba(255,255,255,1)', width: scaleSize(50), height: scaleSize(50), }}
+                  source={{ uri: 'play_fill' }}
+                />
+              </View>
+              <TouchableOpacity style={styles.fullscreenButton}
+                onPress= {()=>{
+                  this.setState({
+                    isFullscreen: true
+                  })
+                  item.isFullscreen = this.state.isFullscreen;
+                } }
+              >
+              </TouchableOpacity>
+              <Video
+                source={{ uri: item.mp4_url }}
+                navigator={this.props.navigator}
+                ref={(ref) => {
+                  this.player = ref
+                }}
+                poster={item.cover}
+                rate={1.0}
+                volume={1.0}
+                muted={true}
+                paused={item.paused === undefined ? true : item.paused }
+                fullscreen={item.isFullscreen === undefined ? false : item.isFullscreen}
+                repeat={false}
+                onProgress={(data) => {
+                  let val = data.currentTime;
+                  this.setState({
+                    sliderValue: val,
+                    currentTime: data.currentTime
+                  })
+                  item.sliderValue = this.state.sliderValue
+                }}
+                playInBackground={false}
+                playWhenInactive={false}
+                progressUpdateInterval={250.0}
+                onEnd ={()=>{
+                  this.setState({
+                  paused: true,
+
+                })
+                item.paused = this.state.paused
+                }}
+                controls={false}
+                style={[{
+                  width: winWidth,
+                  height: scaleSize(420),
+                  transform: [{
+                    rotateZ: this.state.videoRotate
+                  }],
+                },
+                { opacity: 1,}]}
+              />
+              <Slider
+                ref='slider'
+                style={styles.videosilder}
+                value={item.sliderValue}
+                maximumValue={item.length}
+                step={1}
+                minimumTrackTintColor='rgb(255,8,42)'
+                onValueChange={(value) => {
+                  this.setState({
+                    currentTime: value
+                  })
+                }}
+                onSlidingComplete={(value) => {
+                  this.player.seek(value)
+                }}
+              />
+            </TouchableOpacity>
+          </View>
+          <Text style={{ color: '#fff' }}>{item.sliderValue}</Text>
           <View style={styles.videoIteminfo}>
             <Text style={styles.videoitemtitle}>
               {item.title}
             </Text>
-            <View style={{ flexDirection: 'row',paddingLeft:scaleSize(26),paddingTop:scaleSize(20),alignItems: 'center', }}>
-              <DeImage defaultImage={{ uri: this.state.defaultImage }} source={{ uri: item.topicImg }} style={{ width: scaleSize(68), height: scaleSize(68), borderRadius: scaleSize(34) }}  />
-              <Text style={styles.topicName}>{item.topicName}</Text>
+            <View style={{ flexDirection: 'row', paddingLeft: scaleSize(26), paddingTop: scaleSize(20), alignItems: 'center', justifyContent: 'space-between', }}>
+              <View style={{ alignItems: 'center', flexDirection: 'row' }}>
+                <DeImage defaultImage={{ uri: this.state.defaultImage }} source={{ uri: item.topicImg }} style={{ width: scaleSize(68), height: scaleSize(68), borderRadius: scaleSize(34) }} />
+                <Text style={styles.topicName}>{item.topicName}</Text>
+              </View>
+              <View style={styles.dingyuebox}>
+                <Text style={{ color: '#aaa' }}>+订阅</Text>
+              </View>
             </View>
           </View>
         </View>
       </View>
     );
   }
+  //到达顶部触发的函数
   _onEndReached () {
     this.timer=setTimeout(() => {
       if (this.state.listLength >= 20) {
@@ -170,6 +268,7 @@ export default class VideoDetail extends Component {
       this.state.shortList = this.state.shortList.concat(this.state.shortList)
     }, 1000);
   }
+  //FlatList底部组件
   _ListFooterComponent () {
     if (this.state.showFoot) {
       return (
@@ -189,8 +288,7 @@ export default class VideoDetail extends Component {
 }
 const styles = StyleSheet.create({
   videoitemstyle: {
-    width: width,
-    height: scaleSize(374),
+
   },
   VideoDetailheader: {
     backgroundColor:'rgba(17,17,17,1)',
@@ -214,6 +312,46 @@ const styles = StyleSheet.create({
     paddingLeft: scaleSize(20),
     fontSize:setSpText(14),
     fontWeight: '600'
+  },
+  dingyuebox: {
+    padding: scaleSize(20),
+    paddingTop: scaleSize(5),
+    paddingBottom: scaleSize(5),
+    borderWidth:scaleSize(1),
+    borderColor: '#aaa',
+    borderStyle:'solid',
+    marginRight:scaleSize(20),
+    borderRadius: scaleSize(20),
+  },
+  displayButton: {
+    position: 'absolute',
+    height: scaleSize(90),
+    width: scaleSize(90),
+    zIndex: 1,
+    justifyContent: 'center',
+    alignSelf: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    borderRadius: scaleSize(45),
+    borderWidth: 1,
+    borderColor: '#fff',
+    borderStyle: 'solid',
+    opacity:1
+  },
+  fullscreenButton: {
+    position:'absolute',
+    bottom: scaleSize(26),
+    zIndex: 1,
+    right:scaleSize(26)
+  },
+  videosilder: {
+    position:'absolute',
+    bottom:10,
+    left:0,
+    marginLeft: scaleSize(20),
+    marginRight: scaleSize(20),
+    zIndex:2,
+    width: winWidth-scaleSize(40),
   }
 });
 

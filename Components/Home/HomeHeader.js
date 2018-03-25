@@ -13,7 +13,7 @@ import {
   TextInput,
   Image,
   Dimensions,
-  ProgressViewIOS
+  ProgressViewIOS,
 } from 'react-native';
 import { setSpText, scaleSize } from '../../ScreenUtil/ScreenUtil'
 import { TabNavigator } from 'react-navigation';
@@ -31,18 +31,15 @@ export default class HomeHeader extends Component {
             <Image source={{ uri: 'navigationbar_arrow_down' }} style={{ width: scaleSize(20), height: scaleSize(20)}}/>
           </View>
           <View style={styles.inputContainer}>
-            <TextInput 
+            <TextInput
               placeholder="请输入关键词..."
               style={styles.searchinput}
-              placeholderTextColor='rgb(225,224,171)'
+              placeholderTextColor='rgb(225,255,255)'
             />
           </View>
           <View style={{ marginLeft: scaleSize(20), paddingTop: scaleSize(4),}}>
-            <Image source={{ uri: 'customerservice' }} style={{ width: scaleSize(60), height: scaleSize(60) }} tintColor='rgb(225,224,171)'/>
+            <Image source={{ uri: 'customerservice' }} style={{ width: scaleSize(60), height: scaleSize(60) }} tintColor='rgb(255,255,255)'/>
           </View>
-        </View>
-        <View style={styles.backImageContainer}>
-          <Image source={{ uri: 'headerBacImage' }} style={styles.headerImage} />
         </View>
       </View>
     );
@@ -55,27 +52,28 @@ const styles = StyleSheet.create({
     paddingTop: scaleSize(10)
   },
   locationName: {
-    color: 'rgb(225,224,171)',
+    color: 'rgb(255,255,255)',
     fontSize: setSpText(16),
     paddingRight: scaleSize(14)
   },
   searchinput: {
-    color:'rgb(225,224,171)',
+    color:'rgb(225,255,255)',
     fontSize: setSpText(16),
   },
   inputContainer: {
     width: scaleSize(500),
-    backgroundColor: 'rgba(255,255,255,.2)',
+    backgroundColor: 'rgba(255,255,255,.3)',
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: scaleSize(216),
     height:scaleSize(64)
 
-   
-    
+
+
   },
   Homeheader: {
     height: scaleSize(128),
+    backgroundColor:'rgb(247,32,53)'
   },
   headerImage: {
     width: width,
